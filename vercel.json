@@ -10,7 +10,7 @@
       "use": "@vercel/static"
     },
     {
-      "src": "*.css",
+      "src": "*.css", 
       "use": "@vercel/static"
     },
     {
@@ -23,6 +23,14 @@
       "src": "/api/check",
       "dest": "/api/check.js",
       "methods": ["GET", "POST", "OPTIONS"]
+    },
+    {
+      "src": "/style.css",
+      "dest": "/style.css"
+    },
+    {
+      "src": "/script.js", 
+      "dest": "/script.js"
     },
     {
       "src": "/(.*)",
