@@ -59,19 +59,18 @@ async function updateUsageInSupabase(username) {
     }
 }
 
-async function sendDiscordWebhook(username, action, status) {
+async function sendRegistrationNotification(username, discord) {
     try {
-        const embedColor = status === 'approved' ? 3066993 : 15158332; // Green for approved, Red for denied
-        
         const response = await fetch(DISCORD_WEBHOOK, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                content: `📝 **NEW REGISTRATION**`,
                 embeds: [{
-                    title: "🎭 Lyora Whitelist System",
-                    color: embedColor,
+                    title: "🎭 User Mendaftar Whitelist",
+                    color: 3447003,
                     fields: [
                         {
                             name: "👤 Username",
@@ -79,19 +78,20 @@ async function sendDiscordWebhook(username, action, status) {
                             inline: true
                         },
                         {
-                            name: "📝 Action",
-                            value: action,
+                            name: "💬 Discord",
+                            value: discord || 'Not provided',
                             inline: true
                         },
                         {
-                            name: "🔐 Status",
-                            value: status,
-                            inline: true
+                            name: "⏰ Waktu",
+                            value: new Date().toLocaleString('id-ID'),
+                            inline: false
                         }
                     ],
+                    description: "**Admin:** Silakan tambahkan username ini ke GitHub Raw whitelist",
                     timestamp: new Date().toISOString(),
                     footer: {
-                        text: "Lyora Whitelist • " + new Date().toLocaleDateString()
+                        text: "Lyora Whitelist System"
                     }
                 }]
             })
@@ -136,16 +136,10 @@ module.exports = async (req, res) => {
             const user = whitelistData.users[userKey];
             
             if (!user) {
-                // Send webhook for denied access
-                await sendDiscordWebhook(username, 'check', 'DENIED - Not whitelisted');
                 return res.json({ success: false, message: "User not whitelisted" });
             }
             
-            // Update last active
             await updateUsageInSupabase(username);
-            
-            // Send webhook for approved access
-            await sendDiscordWebhook(username, 'check', 'APPROVED - Access granted');
             
             return res.json({ 
                 success: true, 
@@ -158,29 +152,6 @@ module.exports = async (req, res) => {
                 },
                 message: "✅ WHITELISTED - Access granted" 
             });
-        }
-        
-        if (action === 'webhook_verify') {
-            if (!username) return res.json({ success: false, message: "Username required" });
-            
-            const whitelistData = await fetchFromSupabase();
-            const user = whitelistData.users[username.toLowerCase()];
-            
-            if (user) {
-                await sendDiscordWebhook(username, 'webhook_verify', 'APPROVED');
-                await updateUsageInSupabase(username);
-                return res.json({ 
-                    success: true, 
-                    data: user,
-                    message: "✅ WHITELISTED" 
-                });
-            } else {
-                await sendDiscordWebhook(username, 'webhook_verify', 'DENIED');
-                return res.json({ 
-                    success: false, 
-                    message: "❌ NOT WHITELISTED" 
-                });
-            }
         }
         
         if (action === 'register') {
@@ -220,14 +191,15 @@ module.exports = async (req, res) => {
             });
             
             if (response.ok) {
-                await sendDiscordWebhook(username, 'register', 'APPROVED - New registration');
+                // Kirim notifikasi ke Discord
+                await sendRegistrationNotification(username, discord);
+                
                 return res.json({ 
                     success: true, 
                     data: userData,
-                    message: "✅ Registration successful!" 
+                    message: "✅ Registration successful! Admin will review your request." 
                 });
             } else {
-                await sendDiscordWebhook(username, 'register', 'FAILED - Database error');
                 return res.json({ 
                     success: false, 
                     message: `Registration failed: ${response.status}` 
