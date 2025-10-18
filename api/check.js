@@ -13,9 +13,7 @@ async function fetchFromSupabase() {
             }
         });
         
-        if (!response.ok) {
-            return { users: {} };
-        }
+        if (!response.ok) return { users: {} };
         
         const data = await response.json();
         const users = {};
@@ -62,16 +60,24 @@ async function updateUsageInSupabase(username) {
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
     if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ success: false, message: "Method not allowed" });
     
     try {
-        let body = '';
-        for await (const chunk of req) body += chunk;
-        const input = JSON.parse(body);
+        let input = {};
+        
+        // Handle GET and POST requests
+        if (req.method === 'GET') {
+            input = req.query;
+        } else if (req.method === 'POST') {
+            let body = '';
+            for await (const chunk of req) body += chunk;
+            input = JSON.parse(body);
+        } else {
+            return res.status(405).json({ success: false, message: "Method not allowed" });
+        }
         
         const { action, secret, username, admin_password, discord } = input;
         
@@ -163,9 +169,17 @@ module.exports = async (req, res) => {
             
             const whitelistData = await fetchFromSupabase();
             const users = whitelistData.users;
+            const userList = Object.values(users).map(user => ({
+                username: user.username,
+                discord: user.discord,
+                registered_at: user.registered_at,
+                usage_count: user.usage_count,
+                last_active: user.last_active
+            }));
+            
             const stats = {
                 total_users: Object.keys(users).length,
-                users: users
+                users: userList
             };
             
             return res.json({ 
