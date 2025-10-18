@@ -1,1 +1,6 @@
-{}
+{
+  "users": {},
+  "settings": {
+    "auto_approve": true
+  }
+}
