@@ -1,46 +1,39 @@
 const SECRET_KEY = "LYO-RPQS-5CWD-6D5J";
 const ADMIN_PASSWORD = "KYL-DW3X-EGE4-2MTP";
 
-// PAKAI BIN ID ANDA
-const JSONBIN_BIN_ID = "68f3b6d5d0ea88ff4baa39c3";
+// GOOGLE SHEETS CONFIG - PAKAI SHEET ID ANDA
+const SHEET_ID = "1tV-M9MK9bC7HvIrK9VUIW6fNLg2koSbIvTbVQ784yEw";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-// Untuk free tier, kita coba tanpa key dulu
-async function fetchFromJSONBin() {
+// Google Sheets functions
+async function fetchFromSheet() {
     try {
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`);
+        const response = await fetch(SHEET_URL);
+        const text = await response.text();
+        const json = JSON.parse(text.substring(47).slice(0, -2));
         
-        if (response.ok) {
-            const data = await response.json();
-            return data.record;
+        const users = {};
+        if (json.table.rows.length > 1) {
+            for (let i = 1; i < json.table.rows.length; i++) {
+                const row = json.table.rows[i].c;
+                const username = row[0]?.v;
+                if (username) {
+                    users[username.toLowerCase()] = {
+                        username: username,
+                        discord: row[1]?.v || 'Not provided',
+                        status: row[2]?.v || 'approved',
+                        registered_at: row[3]?.v || new Date().toISOString(),
+                        usage_count: parseInt(row[4]?.v) || 0,
+                        last_active: row[5]?.v || null
+                    };
+                }
+            }
         }
-        // Jika error, return default
-        console.log('Fetch failed, using default data');
-        return { 
-            users: {}, 
-            settings: { auto_approve: true } 
-        };
+        
+        return { users, settings: { auto_approve: true } };
     } catch (error) {
-        console.log('Fetch error, using default data');
-        return { 
-            users: {}, 
-            settings: { auto_approve: true } 
-        };
-    }
-}
-
-async function saveToJSONBin(data) {
-    try {
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
-        return response.ok;
-    } catch (error) {
-        console.log('Save error');
-        return false;
+        console.log('Sheet fetch error, using default data');
+        return { users: {}, settings: { auto_approve: true } };
     }
 }
 
@@ -64,8 +57,8 @@ module.exports = async (req, res) => {
             return res.json({ success: false, message: "Invalid secret key" });
         }
         
-        // Get data from JSONBin
-        const whitelistData = await fetchFromJSONBin();
+        // Get data from Sheet
+        const whitelistData = await fetchFromSheet();
         
         if (action === 'check') {
             if (!username) return res.json({ success: false, message: "Username required" });
@@ -76,48 +69,61 @@ module.exports = async (req, res) => {
             if (!user) return res.json({ success: false, message: "User not whitelisted" });
             if (user.status !== 'approved') return res.json({ success: false, message: "User pending approval" });
             
-            // Update usage
-            whitelistData.users[userKey].last_active = new Date().toISOString();
-            whitelistData.users[userKey].usage_count = (whitelistData.users[userKey].usage_count || 0) + 1;
-            await saveToJSONBin(whitelistData);
-            
-            return res.json({ success: true, data: user, message: "Access granted" });
+            return res.json({ 
+                success: true, 
+                data: user, 
+                message: "Access granted" 
+            });
         }
         
         if (action === 'register') {
             if (!username) return res.json({ success: false, message: "Username required" });
             
             const userKey = username.toLowerCase();
-            if (whitelistData.users[userKey]) return res.json({ success: false, message: "Username already registered" });
+            if (whitelistData.users[userKey]) {
+                return res.json({ success: false, message: "Username already registered" });
+            }
             
             const userData = {
                 username: username,
                 discord: discord || 'Not provided',
                 registered_at: new Date().toISOString(),
-                status: whitelistData.settings.auto_approve ? 'approved' : 'pending',
+                status: 'approved',
                 last_active: null,
                 usage_count: 0
             };
             
-            whitelistData.users[userKey] = userData;
-            const saved = await saveToJSONBin(whitelistData);
-            
-            if (saved) {
-                return res.json({ success: true, data: userData, message: "Registration successful" });
-            } else {
-                return res.json({ success: false, message: "Registration failed - try again" });
-            }
+            return res.json({ 
+                success: true, 
+                data: userData, 
+                message: "✅ Registration successful! Add this user manually to Google Sheets." 
+            });
         }
         
         if (action === 'admin_stats') {
-            if (admin_password !== ADMIN_PASSWORD) return res.json({ success: false, message: "Invalid admin password" });
-            return res.json({ success: true, data: whitelistData, message: "Admin stats" });
+            if (admin_password !== ADMIN_PASSWORD) {
+                return res.json({ success: false, message: "Invalid admin password" });
+            }
+            
+            const users = whitelistData.users;
+            const stats = {
+                total_users: Object.keys(users).length,
+                approved_users: Object.values(users).filter(u => u.status === 'approved').length,
+                pending_users: Object.values(users).filter(u => u.status === 'pending').length,
+                users: users
+            };
+            
+            return res.json({ 
+                success: true, 
+                data: stats, 
+                message: "Admin stats" 
+            });
         }
         
         return res.json({ success: false, message: "Unknown action" });
         
     } catch (error) {
         console.error('API Error:', error);
-        return res.json({ success: false, message: "Server error" });
+        return res.json({ success: false, message: "Server error: " + error.message });
     }
 };
