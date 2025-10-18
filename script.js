@@ -1,6 +1,6 @@
 // Configuration
 const API_URL = 'https://register-your-account.vercel.app/api/check';
-const SECRET_KEY = 'LYO-RPQS-5CWD-6D5J';
+const SECRET_KEY = 'LYORA_SECRET_2024';
 
 // DOM Elements
 let totalUsersEl, approvedUsersEl, pendingUsersEl;
