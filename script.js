@@ -17,47 +17,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // API Call Function
 async function apiCall(data) {
-    const btn = document.querySelector('.btn-primary');
-    const btnText = btn.querySelector('.btn-text');
-    const btnLoader = btn.querySelector('.btn-loader');
-    
     try {
-        // Show loading state
-        btnText.classList.add('hidden');
-        btnLoader.classList.remove('hidden');
-        btn.disabled = true;
+        // Use GET request for all actions
+        const params = new URLSearchParams({
+            ...data,
+            secret: SECRET_KEY,
+            timestamp: Date.now()
+        });
         
-        const response = await fetch(API_URL, {
-            method: 'POST',
+        const response = await fetch(`${API_URL}?${params}`, {
+            method: 'GET',
             headers: { 
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                ...data,
-                secret: SECRET_KEY,
-                timestamp: Date.now()
-            })
+                'Content-Type': 'application/json'
+            }
         });
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const result = await response.json();
-        return result;
-        
+        return await response.json();
     } catch (error) {
         console.error('API Call Error:', error);
         return { 
             success: false, 
             message: 'Network error: ' + error.message 
         };
-    } finally {
-        // Hide loading state
-        btnText.classList.remove('hidden');
-        btnLoader.classList.add('hidden');
-        btn.disabled = false;
     }
 }
 
@@ -71,31 +56,23 @@ async function registerUser() {
         return;
     }
     
-    if (username.length < 3 || username.length > 20) {
-        showResult('regResult', 'Username must be between 3-20 characters', 'error');
-        return;
-    }
-    
     const result = await apiCall({
         action: 'register',
         username: username,
-        discord: discord || 'Not provided'
+        discord: discord
     });
     
     if (result.success) {
         showResult('regResult', 
             `✅ Registration Successful!<br><br>
             <strong>Username:</strong> ${result.data.username}<br>
-            <strong>Status:</strong> <span style="color: #10b981">${result.data.status.toUpperCase()}</span><br>
+            <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
             <strong>Registered:</strong> ${new Date(result.data.registered_at).toLocaleDateString()}`,
             'success'
         );
         
-        // Clear form
         document.getElementById('regUsername').value = '';
         document.getElementById('regDiscord').value = '';
-        
-        // Reload stats
         loadStats();
     } else {
         showResult('regResult', `❌ ${result.message}`, 'error');
@@ -104,7 +81,7 @@ async function registerUser() {
 
 // Check Status
 async function checkStatus() {
-    const username = document.getElementById('checkUsername').value.trim().toLowerCase();
+    const username = document.getElementById('checkUsername').value.trim();
     
     if (!username) {
         showResult('checkResult', 'Please enter a username to check', 'error');
@@ -120,7 +97,7 @@ async function checkStatus() {
         showResult('checkResult', 
             `✅ <strong>WHITELISTED</strong><br><br>
             <strong>Username:</strong> ${result.data.username}<br>
-            <strong>Status:</strong> <span style="color: #10b981">${result.data.status.toUpperCase()}</span><br>
+            <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
             <strong>Discord:</strong> ${result.data.discord}<br>
             <strong>Registered:</strong> ${new Date(result.data.registered_at).toLocaleDateString()}<br>
             <strong>Usage Count:</strong> ${result.data.usage_count}`,
@@ -150,40 +127,33 @@ async function getStats() {
             <div style="margin-bottom: 15px;">
                 <strong>📊 Statistics</strong><br>
                 Total Users: ${result.data.total_users}<br>
-                Approved: ${result.data.approved_users}<br>
-                Pending: ${result.data.pending_users}
             </div>
             <strong>👥 Registered Users:</strong>
             <div class="user-list">
         `;
         
-        const users = Object.values(result.data.users).sort((a, b) => 
-            new Date(b.registered_at) - new Date(a.registered_at)
-        );
-        
-        users.forEach(user => {
-            const statusClass = user.status === 'approved' ? 'status-approved' : 'status-pending';
-            html += `
-                <div class="user-item">
-                    <div class="user-info">
-                        <div class="user-name">${user.username}</div>
-                        <div class="user-details">
-                            Discord: ${user.discord} | 
-                            Registered: ${new Date(user.registered_at).toLocaleDateString()} |
-                            Used: ${user.usage_count || 0}x
+        if (result.data.users && result.data.users.length > 0) {
+            result.data.users.forEach(user => {
+                html += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <div class="user-name">${user.username}</div>
+                            <div class="user-details">
+                                Discord: ${user.discord} | 
+                                Registered: ${new Date(user.registered_at).toLocaleDateString()} |
+                                Used: ${user.usage_count || 0}x
+                            </div>
                         </div>
                     </div>
-                    <div class="user-status ${statusClass}">
-                        ${user.status.toUpperCase()}
-                    </div>
-                </div>
-            `;
-        });
+                `;
+            });
+        } else {
+            html += '<div style="text-align: center; color: #888; padding: 20px;">No users registered yet</div>';
+        }
         
         html += '</div>';
         showResult('adminResult', html, 'success');
         
-        // Clear password field
         document.getElementById('adminPass').value = '';
     } else {
         showResult('adminResult', `❌ ${result.message}`, 'error');
@@ -193,26 +163,18 @@ async function getStats() {
 // Load Statistics
 async function loadStats() {
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'admin_stats',
-                admin_password: 'LyoraAdmin2024!',
-                secret: SECRET_KEY
-            })
+        const result = await apiCall({
+            action: 'admin_stats',
+            admin_password: 'LyoraAdmin2024!'
         });
         
-        if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-                totalUsersEl.textContent = result.data.total_users;
-                approvedUsersEl.textContent = result.data.approved_users;
-                pendingUsersEl.textContent = result.data.pending_users;
-            }
+        if (result.success) {
+            totalUsersEl.textContent = result.data.total_users;
+            approvedUsersEl.textContent = result.data.total_users; // Since all are approved
+            pendingUsersEl.textContent = '0';
         }
     } catch (error) {
-        console.log('Stats load failed (normal for non-admin users)');
+        console.log('Stats load failed');
     }
 }
 
@@ -221,16 +183,6 @@ function showResult(elementId, message, type) {
     const element = document.getElementById(elementId);
     element.innerHTML = message;
     element.className = `result ${type}`;
-    
-    // Auto-hide success messages after 8 seconds
-    if (type === 'success') {
-        setTimeout(() => {
-            if (element.innerHTML === message) {
-                element.innerHTML = '';
-                element.className = 'result';
-            }
-        }, 8000);
-    }
 }
 
 // Enter key support
