@@ -8,6 +8,6 @@
   },
   "dependencies": {},
   "engines": {
-    "node": "24.10"
+    "node": "24.x"
   }
 }
