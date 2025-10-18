@@ -34,6 +34,26 @@ async function fetchFromSupabase() {
     }
 }
 
+async function updateUsageInSupabase(username) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/whitelist?username=eq.${encodeURIComponent(username)}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                last_active: new Date().toISOString()
+            })
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+}
+
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -46,8 +66,6 @@ module.exports = async (req, res) => {
         let body = '';
         for await (const chunk of req) body += chunk;
         const input = JSON.parse(body);
-        
-        console.log('Received:', input); // Debug
         
         const { action, secret, username, admin_password, discord } = input;
         
@@ -62,6 +80,9 @@ module.exports = async (req, res) => {
             const user = whitelistData.users[username.toLowerCase()];
             
             if (!user) return res.json({ success: false, message: "User not whitelisted" });
+            
+            // Update last active
+            await updateUsageInSupabase(username);
             
             return res.json({ 
                 success: true, 
@@ -78,9 +99,10 @@ module.exports = async (req, res) => {
                 return res.json({ success: false, message: "Username already registered" });
             }
             
-            const insertData = {
+            const userData = {
                 username: username,
                 discord: discord || 'Not provided',
+                status: 'APPROVED',
                 registered_at: new Date().toISOString(),
                 usage_count: 0,
                 last_active: null
@@ -94,12 +116,19 @@ module.exports = async (req, res) => {
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify(insertData)
+                body: JSON.stringify({
+                    username: userData.username,
+                    discord: userData.discord,
+                    registered_at: userData.registered_at,
+                    usage_count: userData.usage_count,
+                    last_active: userData.last_active
+                })
             });
             
             if (response.ok) {
                 return res.json({ 
                     success: true, 
+                    data: userData,
                     message: "✅ Registration successful!" 
                 });
             } else {
