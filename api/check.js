@@ -13,20 +13,26 @@ async function fetchFromSupabase() {
             }
         });
         
-        if (!response.ok) return { users: {} };
+        if (!response.ok) {
+            return { users: {} };
+        }
         
         const data = await response.json();
         const users = {};
         
-        data.forEach(user => {
-            users[user.username.toLowerCase()] = {
-                username: user.username,
-                discord: user.discord || 'Not provided',
-                registered_at: user.registered_at,
-                usage_count: user.usage_count || 0,
-                last_active: user.last_active
-            };
-        });
+        if (data && Array.isArray(data)) {
+            data.forEach(user => {
+                if (user && user.username) {
+                    users[user.username.toLowerCase()] = {
+                        username: user.username,
+                        discord: user.discord || 'Not provided',
+                        registered_at: user.registered_at,
+                        usage_count: user.usage_count || 0,
+                        last_active: user.last_active
+                    };
+                }
+            });
+        }
         
         return { users };
     } catch (error) {
@@ -77,16 +83,25 @@ module.exports = async (req, res) => {
             if (!username) return res.json({ success: false, message: "Username required" });
             
             const whitelistData = await fetchFromSupabase();
-            const user = whitelistData.users[username.toLowerCase()];
+            const userKey = username.toLowerCase();
+            const user = whitelistData.users[userKey];
             
-            if (!user) return res.json({ success: false, message: "User not whitelisted" });
+            if (!user) {
+                return res.json({ success: false, message: "User not whitelisted" });
+            }
             
             // Update last active
             await updateUsageInSupabase(username);
             
             return res.json({ 
                 success: true, 
-                data: user, 
+                data: {
+                    username: user.username,
+                    discord: user.discord,
+                    status: "APPROVED",
+                    registered_at: user.registered_at,
+                    usage_count: user.usage_count
+                },
                 message: "✅ WHITELISTED - Access granted" 
             });
         }
@@ -95,7 +110,9 @@ module.exports = async (req, res) => {
             if (!username) return res.json({ success: false, message: "Username required" });
             
             const whitelistData = await fetchFromSupabase();
-            if (whitelistData.users[username.toLowerCase()]) {
+            const userKey = username.toLowerCase();
+            
+            if (whitelistData.users[userKey]) {
                 return res.json({ success: false, message: "Username already registered" });
             }
             
