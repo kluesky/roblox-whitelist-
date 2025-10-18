@@ -1,5 +1,4 @@
-const SECRET_KEY = "LYO-RPQS-5CWD-6D5J";
-const ADMIN_PASSWORD = "KYL-DW3X-EGE4-2MTP";
+const SECRET_KEY = "LYORA_SECRET_2024";
 
 const SUPABASE_URL = "https://zkasatfmcsiffjgpsdzj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYXNhdGZtY3NpZmZqZ3BzZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3NzgyODUsImV4cCI6MjA3NjM1NDI4NX0.9JnTK17_hPjuZZa0BcL09CfB_1OzSm1AY0x9ff5OKrU";
@@ -13,7 +12,10 @@ module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ success: false, message: "Method not allowed" });
     
     try {
-        const input = req.body;
+        let body = '';
+        for await (const chunk of req) body += chunk;
+        const input = JSON.parse(body);
+        
         const { action, secret, username, discord } = input;
         
         if (secret !== SECRET_KEY) {
@@ -21,7 +23,16 @@ module.exports = async (req, res) => {
         }
         
         if (action === 'register') {
-            // Simple direct insert
+            const insertData = {
+                username: username,
+                discord: discord || 'Not provided',
+                status: 'approved',
+                registered_at: new Date().toISOString(),
+                usage_count: 0
+            };
+            
+            console.log('Inserting:', insertData);
+            
             const response = await fetch(`${SUPABASE_URL}/rest/v1/whitelist`, {
                 method: 'POST',
                 headers: {
@@ -30,31 +41,22 @@ module.exports = async (req, res) => {
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify({
-                    username: username,
-                    discord: discord || 'Not provided',
-                    status: 'approved',
-                    registered_at: new Date().toISOString(),
-                    usage_count: 0
-                })
+                body: JSON.stringify(insertData)
             });
             
-            if (response.status === 201 || response.status === 409) {
-                return res.json({ 
-                    success: true, 
-                    message: "✅ Registration successful!" 
-                });
+            console.log('Response status:', response.status);
+            
+            if (response.ok) {
+                return res.json({ success: true, message: "✅ Registration successful!" });
             } else {
-                return res.json({ 
-                    success: false, 
-                    message: `Registration failed: ${response.status}` 
-                });
+                const error = await response.text();
+                return res.json({ success: false, message: `Failed: ${response.status} - ${error}` });
             }
         }
         
         return res.json({ success: false, message: "Unknown action" });
         
     } catch (error) {
-        return res.json({ success: false, message: "Server error" });
+        return res.json({ success: false, message: "Server error: " + error.message });
     }
 };
