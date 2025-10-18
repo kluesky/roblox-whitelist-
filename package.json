@@ -1,0 +1,13 @@
+{
+  "name": "lyora-whitelist",
+  "version": "1.0.0",
+  "description": "Lyora Whitelist System",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node server.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": "18.x"
+  }
+}

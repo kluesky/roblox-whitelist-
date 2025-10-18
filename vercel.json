@@ -2,8 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/check.php",
-      "use": "@vercel/php"
+      "src": "api/check.js",
+      "use": "@vercel/node"
     },
     {
       "src": "*.html",
@@ -21,7 +21,8 @@
   "routes": [
     {
       "src": "/api/check",
-      "dest": "/api/check.php"
+      "dest": "/api/check.js",
+      "methods": ["GET", "POST", "OPTIONS"]
     },
     {
       "src": "/(.*)",
