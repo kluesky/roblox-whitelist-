@@ -1,5 +1,5 @@
 // Configuration
-const API_URL = '/api/check';
+const API_URL = 'https://register-your-account.vercel.app/api/check';
 const SECRET_KEY = 'LYO-RPQS-5CWD-6D5J';
 
 // DOM Elements
