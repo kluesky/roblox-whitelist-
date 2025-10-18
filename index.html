@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyora • Whitelist</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <h1>Lyora</h1>
+            </div>
+            <p class="subtitle">Whitelist System</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <!-- Register Section -->
+            <div class="section">
+                <h2>📝 Register Whitelist</h2>
+                <div class="input-group">
+                    <input type="text" id="regUsername" placeholder="Enter your Roblox username" maxlength="20">
+                    <small>Make sure it matches your exact Roblox username</small>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="regDiscord" placeholder="Discord ID (optional)" maxlength="37">
+                </div>
+                <button class="btn-primary" onclick="registerUser()">
+                    <span class="btn-text">Register Account</span>
+                    <div class="btn-loader hidden"></div>
+                </button>
+                <div id="regResult" class="result"></div>
+            </div>
+
+            <!-- Check Status Section -->
+            <div class="section">
+                <h2>🔍 Check Status</h2>
+                <div class="input-group">
+                    <input type="text" id="checkUsername" placeholder="Enter username to check">
+                </div>
+                <button class="btn-secondary" onclick="checkStatus()">Check Whitelist</button>
+                <div id="checkResult" class="result"></div>
+            </div>
+
+            <!-- Admin Section -->
+            <div class="section">
+                <h2>⚙️ Admin Panel</h2>
+                <div class="input-group">
+                    <input type="password" id="adminPass" placeholder="Enter admin password">
+                </div>
+                <button class="btn-admin" onclick="getStats()">Access Panel</button>
+                <div id="adminResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- Stats Footer -->
+        <div class="footer">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="approvedUsers">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="pendingUsers">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
