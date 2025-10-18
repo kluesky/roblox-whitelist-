@@ -1,5 +1,6 @@
 const SECRET_KEY = "LYORA_SECRET_2024";
 const ADMIN_PASSWORD = "LyoraAdmin2024!";
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1423615242428219485/l1t2uH19b3fFasWFucddPqSuGwjOWuEoobizwN58kQ-HJsCS-urKqE3wMgUOkl9VHgNu";
 
 const SUPABASE_URL = "https://zkasatfmcsiffjgpsdzj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYXNhdGZtY3NpZmZqZ3BzZHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3NzgyODUsImV4cCI6MjA3NjM1NDI4NX0.9JnTK17_hPjuZZa0BcL09CfB_1OzSm1AY0x9ff5OKrU";
@@ -58,6 +59,49 @@ async function updateUsageInSupabase(username) {
     }
 }
 
+async function sendDiscordWebhook(username, action, status) {
+    try {
+        const embedColor = status === 'approved' ? 3066993 : 15158332; // Green for approved, Red for denied
+        
+        const response = await fetch(DISCORD_WEBHOOK, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                embeds: [{
+                    title: "🎭 Lyora Whitelist System",
+                    color: embedColor,
+                    fields: [
+                        {
+                            name: "👤 Username",
+                            value: username,
+                            inline: true
+                        },
+                        {
+                            name: "📝 Action",
+                            value: action,
+                            inline: true
+                        },
+                        {
+                            name: "🔐 Status",
+                            value: status,
+                            inline: true
+                        }
+                    ],
+                    timestamp: new Date().toISOString(),
+                    footer: {
+                        text: "Lyora Whitelist • " + new Date().toLocaleDateString()
+                    }
+                }]
+            })
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+}
+
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -68,7 +112,6 @@ module.exports = async (req, res) => {
     try {
         let input = {};
         
-        // Handle GET and POST requests
         if (req.method === 'GET') {
             input = req.query;
         } else if (req.method === 'POST') {
@@ -93,11 +136,16 @@ module.exports = async (req, res) => {
             const user = whitelistData.users[userKey];
             
             if (!user) {
+                // Send webhook for denied access
+                await sendDiscordWebhook(username, 'check', 'DENIED - Not whitelisted');
                 return res.json({ success: false, message: "User not whitelisted" });
             }
             
             // Update last active
             await updateUsageInSupabase(username);
+            
+            // Send webhook for approved access
+            await sendDiscordWebhook(username, 'check', 'APPROVED - Access granted');
             
             return res.json({ 
                 success: true, 
@@ -110,6 +158,29 @@ module.exports = async (req, res) => {
                 },
                 message: "✅ WHITELISTED - Access granted" 
             });
+        }
+        
+        if (action === 'webhook_verify') {
+            if (!username) return res.json({ success: false, message: "Username required" });
+            
+            const whitelistData = await fetchFromSupabase();
+            const user = whitelistData.users[username.toLowerCase()];
+            
+            if (user) {
+                await sendDiscordWebhook(username, 'webhook_verify', 'APPROVED');
+                await updateUsageInSupabase(username);
+                return res.json({ 
+                    success: true, 
+                    data: user,
+                    message: "✅ WHITELISTED" 
+                });
+            } else {
+                await sendDiscordWebhook(username, 'webhook_verify', 'DENIED');
+                return res.json({ 
+                    success: false, 
+                    message: "❌ NOT WHITELISTED" 
+                });
+            }
         }
         
         if (action === 'register') {
@@ -149,12 +220,14 @@ module.exports = async (req, res) => {
             });
             
             if (response.ok) {
+                await sendDiscordWebhook(username, 'register', 'APPROVED - New registration');
                 return res.json({ 
                     success: true, 
                     data: userData,
                     message: "✅ Registration successful!" 
                 });
             } else {
+                await sendDiscordWebhook(username, 'register', 'FAILED - Database error');
                 return res.json({ 
                     success: false, 
                     message: `Registration failed: ${response.status}` 
