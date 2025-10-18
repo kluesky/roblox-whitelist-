@@ -26,12 +26,10 @@ module.exports = async (req, res) => {
             const insertData = {
                 username: username,
                 discord: discord || 'Not provided',
-                status: 'approved',
                 registered_at: new Date().toISOString(),
-                usage_count: 0
+                usage_count: 0,
+                last_active: null
             };
-            
-            console.log('Inserting:', insertData);
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/whitelist`, {
                 method: 'POST',
@@ -44,19 +42,16 @@ module.exports = async (req, res) => {
                 body: JSON.stringify(insertData)
             });
             
-            console.log('Response status:', response.status);
-            
             if (response.ok) {
                 return res.json({ success: true, message: "✅ Registration successful!" });
             } else {
-                const error = await response.text();
-                return res.json({ success: false, message: `Failed: ${response.status} - ${error}` });
+                return res.json({ success: false, message: `Registration failed: ${response.status}` });
             }
         }
         
         return res.json({ success: false, message: "Unknown action" });
         
     } catch (error) {
-        return res.json({ success: false, message: "Server error: " + error.message });
+        return res.json({ success: false, message: "Server error" });
     }
 };
