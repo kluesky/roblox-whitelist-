@@ -9,29 +9,35 @@
 </head>
 <body>
     <div class="container">
+        <!-- Language Selector -->
+        <div class="language-switcher">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="id">ID</button>
+        </div>
+
         <!-- Header -->
         <div class="header">
             <div class="logo">
                 <div class="logo-icon">⚡</div>
-                <h1>Lyora</h1>
+                <h1 data-i18n="title">Lyora</h1>
             </div>
-            <p class="subtitle">Whitelist System</p>
+            <p class="subtitle" data-i18n="subtitle">Whitelist System</p>
         </div>
 
         <!-- Main Card -->
         <div class="card">
             <!-- Register Section -->
             <div class="section">
-                <h2>📝 Register Whitelist</h2>
+                <h2 data-i18n="registerTitle">📝 Register Whitelist</h2>
                 <div class="input-group">
-                    <input type="text" id="regUsername" placeholder="Enter your Roblox username" maxlength="20">
-                    <small>Make sure it matches your exact Roblox username</small>
+                    <input type="text" id="regUsername" data-i18n-placeholder="usernamePlaceholder" maxlength="20">
+                    <small data-i18n="usernameHint">Make sure it matches your exact Roblox username</small>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="regDiscord" placeholder="Discord ID (optional)" maxlength="37">
+                    <input type="text" id="regDiscord" data-i18n-placeholder="discordPlaceholder" maxlength="37">
                 </div>
                 <button class="btn-primary" onclick="registerUser()">
-                    <span class="btn-text">Register Account</span>
+                    <span class="btn-text" data-i18n="registerBtn">Register Account</span>
                     <div class="btn-loader hidden"></div>
                 </button>
                 <div id="regResult" class="result"></div>
@@ -39,21 +45,21 @@
 
             <!-- Check Status Section -->
             <div class="section">
-                <h2>🔍 Check Status</h2>
+                <h2 data-i18n="checkTitle">🔍 Check Status</h2>
                 <div class="input-group">
-                    <input type="text" id="checkUsername" placeholder="Enter username to check">
+                    <input type="text" id="checkUsername" data-i18n-placeholder="checkPlaceholder">
                 </div>
-                <button class="btn-secondary" onclick="checkStatus()">Check Whitelist</button>
+                <button class="btn-secondary" onclick="checkStatus()" data-i18n="checkBtn">Check Whitelist</button>
                 <div id="checkResult" class="result"></div>
             </div>
 
             <!-- Admin Section -->
             <div class="section">
-                <h2>⚙️ Admin Panel</h2>
+                <h2 data-i18n="adminTitle">⚙️ Admin Panel</h2>
                 <div class="input-group">
-                    <input type="password" id="adminPass" placeholder="Enter admin password">
+                    <input type="password" id="adminPass" data-i18n-placeholder="adminPlaceholder">
                 </div>
-                <button class="btn-admin" onclick="getStats()">Access Panel</button>
+                <button class="btn-admin" onclick="getStats()" data-i18n="adminBtn">Access Panel</button>
                 <div id="adminResult" class="result"></div>
             </div>
         </div>
@@ -63,17 +69,30 @@
             <div class="stats">
                 <div class="stat">
                     <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
+                    <div class="stat-label" data-i18n="totalUsers">Total Users</div>
                 </div>
                 <div class="stat">
                     <div class="stat-number" id="approvedUsers">0</div>
-                    <div class="stat-label">Approved</div>
+                    <div class="stat-label" data-i18n="approvedUsers">Approved</div>
                 </div>
                 <div class="stat">
                     <div class="stat-number" id="pendingUsers">0</div>
-                    <div class="stat-label">Pending</div>
+                    <div class="stat-label" data-i18n="pendingUsers">Pending</div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Wait Popup -->
+    <div id="waitPopup" class="popup hidden">
+        <div class="popup-content">
+            <div class="popup-icon">⏳</div>
+            <h3 data-i18n="popupTitle">Please Wait</h3>
+            <p data-i18n="popupMessage">Admin will confirm your registration within 4 minutes</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <button class="popup-btn" onclick="closePopup()" data-i18n="popupBtn">Understood</button>
         </div>
     </div>
 

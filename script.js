@@ -2,6 +2,54 @@
 const API_URL = 'https://register-your-account.vercel.app/api/check';
 const SECRET_KEY = 'LYORA_SECRET_2024';
 
+// Multi-language support
+const translations = {
+    en: {
+        title: "Lyora",
+        subtitle: "Whitelist System",
+        registerTitle: "📝 Register Whitelist",
+        checkTitle: "🔍 Check Status", 
+        adminTitle: "⚙️ Admin Panel",
+        usernamePlaceholder: "Enter your Roblox username",
+        discordPlaceholder: "Discord ID (optional)",
+        checkPlaceholder: "Enter username to check",
+        adminPlaceholder: "Enter admin password",
+        usernameHint: "Make sure it matches your exact Roblox username",
+        registerBtn: "Register Account",
+        checkBtn: "Check Whitelist",
+        adminBtn: "Access Panel",
+        totalUsers: "Total Users",
+        approvedUsers: "Approved", 
+        pendingUsers: "Pending",
+        popupTitle: "Please Wait",
+        popupMessage: "Admin will confirm your registration within 4 minutes",
+        popupBtn: "Understood"
+    },
+    id: {
+        title: "Lyora", 
+        subtitle: "Sistem Whitelist",
+        registerTitle: "📝 Daftar Whitelist",
+        checkTitle: "🔍 Cek Status",
+        adminTitle: "⚙️ Panel Admin",
+        usernamePlaceholder: "Masukkan username Roblox Anda",
+        discordPlaceholder: "Discord ID (opsional)",
+        checkPlaceholder: "Masukkan username untuk dicek",
+        adminPlaceholder: "Masukkan password admin",
+        usernameHint: "Pastikan sesuai dengan username Roblox Anda",
+        registerBtn: "Daftar Akun",
+        checkBtn: "Cek Whitelist", 
+        adminBtn: "Akses Panel",
+        totalUsers: "Total Pengguna",
+        approvedUsers: "Disetujui",
+        pendingUsers: "Menunggu",
+        popupTitle: "Harap Tunggu",
+        popupMessage: "Admin akan konfirmasi pendaftaran Anda dalam 4 menit",
+        popupBtn: "Mengerti"
+    }
+};
+
+let currentLang = 'en';
+
 // DOM Elements
 let totalUsersEl, approvedUsersEl, pendingUsersEl;
 
@@ -11,14 +59,50 @@ document.addEventListener('DOMContentLoaded', function() {
     approvedUsersEl = document.getElementById('approvedUsers');
     pendingUsersEl = document.getElementById('pendingUsers');
     
+    initLanguage();
     loadStats();
     console.log('⚡ Lyora Whitelist System Loaded');
 });
 
+// Language System
+function initLanguage() {
+    const langButtons = document.querySelectorAll('.lang-btn');
+    
+    langButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            switchLanguage(lang);
+            
+            // Update active state
+            langButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+}
+
+function switchLanguage(lang) {
+    currentLang = lang;
+    
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            element.textContent = translations[lang][key];
+        }
+    });
+    
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translations[lang][key]) {
+            element.placeholder = translations[lang][key];
+        }
+    });
+}
+
 // API Call Function
 async function apiCall(data) {
     try {
-        // Use GET request for all actions
         const params = new URLSearchParams({
             ...data,
             secret: SECRET_KEY,
@@ -52,9 +136,18 @@ async function registerUser() {
     const discord = document.getElementById('regDiscord').value.trim();
     
     if (!username) {
-        showResult('regResult', 'Please enter a Roblox username', 'error');
+        showResult('regResult', currentLang === 'en' ? 'Please enter a Roblox username' : 'Harap masukkan username Roblox', 'error');
         return;
     }
+    
+    const btn = document.querySelector('.btn-primary');
+    const btnText = btn.querySelector('.btn-text');
+    const btnLoader = btn.querySelector('.btn-loader');
+    
+    // Show loading
+    btnText.classList.add('hidden');
+    btnLoader.classList.remove('hidden');
+    btn.disabled = true;
     
     const result = await apiCall({
         action: 'register',
@@ -62,12 +155,25 @@ async function registerUser() {
         discord: discord
     });
     
+    // Hide loading
+    btnText.classList.remove('hidden');
+    btnLoader.classList.add('hidden');
+    btn.disabled = false;
+    
     if (result.success) {
+        // Show wait popup ONLY after successful registration
+        showWaitPopup();
+        
         showResult('regResult', 
-            `✅ Registration Successful!<br><br>
-            <strong>Username:</strong> ${result.data.username}<br>
-            <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
-            <strong>Registered:</strong> ${new Date(result.data.registered_at).toLocaleDateString()}`,
+            currentLang === 'en' 
+                ? `✅ Registration Successful!<br><br>
+                   <strong>Username:</strong> ${result.data.username}<br>
+                   <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
+                   <strong>Registered:</strong> ${new Date(result.data.registered_at).toLocaleDateString()}`
+                : `✅ Pendaftaran Berhasil!<br><br>
+                   <strong>Username:</strong> ${result.data.username}<br>
+                   <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
+                   <strong>Terdaftar:</strong> ${new Date(result.data.registered_at).toLocaleDateString('id-ID')}`,
             'success'
         );
         
@@ -84,7 +190,7 @@ async function checkStatus() {
     const username = document.getElementById('checkUsername').value.trim();
     
     if (!username) {
-        showResult('checkResult', 'Please enter a username to check', 'error');
+        showResult('checkResult', currentLang === 'en' ? 'Please enter a username to check' : 'Harap masukkan username untuk dicek', 'error');
         return;
     }
     
@@ -95,12 +201,19 @@ async function checkStatus() {
     
     if (result.success) {
         showResult('checkResult', 
-            `✅ <strong>WHITELISTED</strong><br><br>
-            <strong>Username:</strong> ${result.data.username}<br>
-            <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
-            <strong>Discord:</strong> ${result.data.discord}<br>
-            <strong>Registered:</strong> ${new Date(result.data.registered_at).toLocaleDateString()}<br>
-            <strong>Usage Count:</strong> ${result.data.usage_count}`,
+            currentLang === 'en'
+                ? `✅ <strong>WHITELISTED</strong><br><br>
+                   <strong>Username:</strong> ${result.data.username}<br>
+                   <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
+                   <strong>Discord:</strong> ${result.data.discord}<br>
+                   <strong>Registered:</strong> ${new Date(result.data.registered_at).toLocaleDateString()}<br>
+                   <strong>Usage Count:</strong> ${result.data.usage_count}`
+                : `✅ <strong>TERDAFTAR</strong><br><br>
+                   <strong>Username:</strong> ${result.data.username}<br>
+                   <strong>Status:</strong> <span style="color: #10b981">${result.data.status}</span><br>
+                   <strong>Discord:</strong> ${result.data.discord}<br>
+                   <strong>Terdaftar:</strong> ${new Date(result.data.registered_at).toLocaleDateString('id-ID')}<br>
+                   <strong>Digunakan:</strong> ${result.data.usage_count}x`,
             'success'
         );
     } else {
@@ -113,7 +226,7 @@ async function getStats() {
     const adminPass = document.getElementById('adminPass').value;
     
     if (!adminPass) {
-        showResult('adminResult', 'Please enter admin password', 'error');
+        showResult('adminResult', currentLang === 'en' ? 'Please enter admin password' : 'Harap masukkan password admin', 'error');
         return;
     }
     
@@ -123,14 +236,19 @@ async function getStats() {
     });
     
     if (result.success) {
-        let html = `
-            <div style="margin-bottom: 15px;">
-                <strong>📊 Statistics</strong><br>
-                Total Users: ${result.data.total_users}<br>
-            </div>
-            <strong>👥 Registered Users:</strong>
-            <div class="user-list">
-        `;
+        let html = currentLang === 'en'
+            ? `<div style="margin-bottom: 15px;">
+                  <strong>📊 Statistics</strong><br>
+                  Total Users: ${result.data.total_users}<br>
+               </div>
+               <strong>👥 Registered Users:</strong>
+               <div class="user-list">`
+            : `<div style="margin-bottom: 15px;">
+                  <strong>📊 Statistik</strong><br>
+                  Total Pengguna: ${result.data.total_users}<br>
+               </div>
+               <strong>👥 Pengguna Terdaftar:</strong>
+               <div class="user-list">`;
         
         if (result.data.users && result.data.users.length > 0) {
             result.data.users.forEach(user => {
@@ -140,15 +258,17 @@ async function getStats() {
                             <div class="user-name">${user.username}</div>
                             <div class="user-details">
                                 Discord: ${user.discord} | 
-                                Registered: ${new Date(user.registered_at).toLocaleDateString()} |
-                                Used: ${user.usage_count || 0}x
+                                ${currentLang === 'en' ? 'Registered' : 'Terdaftar'}: ${new Date(user.registered_at).toLocaleDateString()} |
+                                ${currentLang === 'en' ? 'Used' : 'Digunakan'}: ${user.usage_count || 0}x
                             </div>
                         </div>
                     </div>
                 `;
             });
         } else {
-            html += '<div style="text-align: center; color: #888; padding: 20px;">No users registered yet</div>';
+            html += currentLang === 'en' 
+                ? '<div style="text-align: center; color: #888; padding: 20px;">No users registered yet</div>'
+                : '<div style="text-align: center; color: #888; padding: 20px;">Belum ada pengguna terdaftar</div>';
         }
         
         html += '</div>';
@@ -158,6 +278,24 @@ async function getStats() {
     } else {
         showResult('adminResult', `❌ ${result.message}`, 'error');
     }
+}
+
+// Wait Popup Functions
+function showWaitPopup() {
+    const popup = document.getElementById('waitPopup');
+    popup.classList.remove('hidden');
+    
+    // Reset and start loading animation
+    const loadingBar = popup.querySelector('.loading-progress');
+    loadingBar.style.animation = 'none';
+    setTimeout(() => {
+        loadingBar.style.animation = 'loading 4s linear';
+    }, 10);
+}
+
+function closePopup() {
+    const popup = document.getElementById('waitPopup');
+    popup.classList.add('hidden');
 }
 
 // Load Statistics
@@ -170,7 +308,7 @@ async function loadStats() {
         
         if (result.success) {
             totalUsersEl.textContent = result.data.total_users;
-            approvedUsersEl.textContent = result.data.total_users; // Since all are approved
+            approvedUsersEl.textContent = result.data.total_users;
             pendingUsersEl.textContent = '0';
         }
     } catch (error) {
@@ -196,5 +334,12 @@ document.addEventListener('keypress', function(event) {
         } else if (focused.id === 'adminPass') {
             getStats();
         }
+    }
+});
+
+// Close popup when clicking outside
+document.getElementById('waitPopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePopup();
     }
 });
