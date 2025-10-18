@@ -1,160 +1,208 @@
 const fs = require('fs');
 const path = require('path');
 
-// Konfigurasi
 const SECRET_KEY = "LYO-RPQS-5CWD-6D5J";
 const ADMIN_PASSWORD = "KYL-DW3X-EGE4-2MTP!";
+
+// Pastikan path yang benar untuk Vercel
 const DB_FILE = path.join(process.cwd(), 'whitelist.json');
 
-// Helper functions
 function initializeDatabase() {
-    if (!fs.existsSync(DB_FILE)) {
-        const initialData = {
-            users: {},
-            settings: {
-                secret: SECRET_KEY,
-                auto_approve: true,
-                created_at: new Date().toISOString()
-            }
-        };
-        fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
+    try {
+        if (!fs.existsSync(DB_FILE)) {
+            const initialData = {
+                users: {},
+                settings: {
+                    secret: SECRET_KEY,
+                    auto_approve: true,
+                    created_at: new Date().toISOString()
+                }
+            };
+            fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
+            console.log('Database initialized');
+        }
+    } catch (error) {
+        console.error('Init DB error:', error);
     }
 }
 
 function readDatabase() {
-    initializeDatabase();
     try {
+        initializeDatabase();
         const data = fs.readFileSync(DB_FILE, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        return { users: {}, settings: {} };
+        console.error('Read DB error:', error);
+        return { users: {}, settings: { auto_approve: true } };
     }
 }
 
 function saveDatabase(data) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+    try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Save DB error:', error);
+        return false;
+    }
 }
 
-function jsonResponse(success, data = null, message = "") {
-    return {
-        success,
-        data,
-        message,
-        timestamp: new Date().toISOString()
-    };
-}
-
-// Main handler
 module.exports = async (req, res) => {
-    // Set CORS headers
+    console.log('API Called:', req.method, req.url);
+    
+    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
     
     if (req.method !== 'POST') {
-        return res.status(405).json(jsonResponse(false, null, "Method not allowed"));
+        return res.status(405).json({ 
+            success: false, 
+            message: "Method not allowed" 
+        });
     }
     
     try {
-        const input = req.body;
-        
-        if (!input) {
-            return res.status(400).json(jsonResponse(false, null, "Invalid JSON input"));
+        let body = '';
+        for await (const chunk of req) {
+            body += chunk;
         }
+        const input = JSON.parse(body);
         
-        const action = input.action || 'check';
-        const secret = input.secret || '';
-        const username = input.username ? input.username.toLowerCase().trim() : '';
+        console.log('Received:', input.action, input.username);
         
-        // Verifikasi secret key
+        const { action, secret, username, admin_password, discord } = input;
+        
         if (secret !== SECRET_KEY) {
-            return res.status(401).json(jsonResponse(false, null, "Invalid secret key"));
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid secret key" 
+            });
         }
         
         const db = readDatabase();
         
-        switch (action) {
-            case 'check':
-                if (!username) {
-                    return res.status(400).json(jsonResponse(false, null, "Username is required"));
-                }
-                
-                const user = db.users[username];
-                
-                if (!user) {
-                    return res.status(404).json(jsonResponse(false, null, "User not whitelisted"));
-                }
-                
-                if (user.status !== 'approved') {
-                    return res.status(403).json(jsonResponse(false, null, "User pending approval"));
-                }
-                
-                // Update last active
-                db.users[username].last_active = new Date().toISOString();
-                db.users[username].usage_count = (db.users[username].usage_count || 0) + 1;
-                saveDatabase(db);
-                
-                return res.json(jsonResponse(true, {
-                    username: user.username,
-                    status: user.status,
-                    discord: user.discord || 'Not provided',
-                    registered_at: user.registered_at,
-                    usage_count: db.users[username].usage_count
-                }, "Access granted"));
-                
-            case 'register':
-                if (!username) {
-                    return res.status(400).json(jsonResponse(false, null, "Username is required"));
-                }
-                
-                if (db.users[username]) {
-                    return res.status(409).json(jsonResponse(false, null, "Username already registered"));
-                }
-                
-                const userData = {
-                    username: input.username,
-                    discord: input.discord || 'Not provided',
-                    registered_at: new Date().toISOString(),
-                    status: db.settings.auto_approve ? 'approved' : 'pending',
-                    last_active: null,
-                    usage_count: 0
-                };
-                
-                db.users[username] = userData;
-                saveDatabase(db);
-                
-                return res.json(jsonResponse(true, userData, "Registration successful"));
-                
-            case 'admin_stats':
-                const adminPass = input.admin_password || '';
-                if (adminPass !== ADMIN_PASSWORD) {
-                    return res.status(401).json(jsonResponse(false, null, "Invalid admin password"));
-                }
-                
-                const users = db.users;
-                const totalUsers = Object.keys(users).length;
-                const approvedUsers = Object.values(users).filter(user => user.status === 'approved').length;
-                const pendingUsers = Object.values(users).filter(user => user.status === 'pending').length;
-                
-                const stats = {
-                    total_users: totalUsers,
-                    approved_users: approvedUsers,
-                    pending_users: pendingUsers,
-                    users: users
-                };
-                
-                return res.json(jsonResponse(true, stats, "Admin statistics"));
-                
-            default:
-                return res.status(400).json(jsonResponse(false, null, "Unknown action"));
+        if (action === 'check') {
+            if (!username) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Username required" 
+                });
+            }
+            
+            const userKey = username.toLowerCase();
+            const user = db.users[userKey];
+            
+            if (!user) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: "User not whitelisted" 
+                });
+            }
+            
+            if (user.status !== 'approved') {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: "User pending approval" 
+                });
+            }
+            
+            // Update usage
+            db.users[userKey].last_active = new Date().toISOString();
+            db.users[userKey].usage_count = (db.users[userKey].usage_count || 0) + 1;
+            
+            if (saveDatabase(db)) {
+                return res.json({
+                    success: true,
+                    data: user,
+                    message: "Access granted"
+                });
+            } else {
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Database error" 
+                });
+            }
         }
+        
+        if (action === 'register') {
+            if (!username) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Username required" 
+                });
+            }
+            
+            const userKey = username.toLowerCase();
+            if (db.users[userKey]) {
+                return res.status(409).json({ 
+                    success: false, 
+                    message: "Username already registered" 
+                });
+            }
+            
+            const userData = {
+                username: username,
+                discord: discord || 'Not provided',
+                registered_at: new Date().toISOString(),
+                status: db.settings?.auto_approve ? 'approved' : 'pending',
+                last_active: null,
+                usage_count: 0
+            };
+            
+            db.users[userKey] = userData;
+            
+            if (saveDatabase(db)) {
+                return res.json({
+                    success: true,
+                    data: userData,
+                    message: "Registration successful"
+                });
+            } else {
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to save registration" 
+                });
+            }
+        }
+        
+        if (action === 'admin_stats') {
+            if (admin_password !== ADMIN_PASSWORD) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: "Invalid admin password" 
+                });
+            }
+            
+            const users = db.users;
+            const stats = {
+                total_users: Object.keys(users).length,
+                approved_users: Object.values(users).filter(u => u.status === 'approved').length,
+                pending_users: Object.values(users).filter(u => u.status === 'pending').length,
+                users: users
+            };
+            
+            return res.json({ 
+                success: true, 
+                data: stats, 
+                message: "Admin stats" 
+            });
+        }
+        
+        return res.status(400).json({ 
+            success: false, 
+            message: "Unknown action" 
+        });
         
     } catch (error) {
         console.error('API Error:', error);
-        return res.status(500).json(jsonResponse(false, null, "Internal server error"));
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal server error: " + error.message 
+        });
     }
 };
