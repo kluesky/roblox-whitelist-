@@ -3,81 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyora • Whitelist</title>
+    <title>Lyora • System Down</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- Language Selector -->
-        <div class="language-switcher">
-            <button class="lang-btn active" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="id">ID</button>
-        </div>
-
         <!-- Header -->
         <div class="header">
             <div class="logo">
-                <div class="logo-icon">⚡</div>
-                <h1 data-i18n="title">Lyora</h1>
+                <div class="logo-icon">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="12" fill="url(#logoGradient)"/>
+                        <path d="M16 20L18 22L24 16" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#007AFF"/>
+                                <stop offset="1" stop-color="#5856D6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1>Lyora</h1>
             </div>
-            <p class="subtitle" data-i18n="subtitle">Whitelist System</p>
+            <p class="subtitle">Whitelist System</p>
         </div>
 
-        <!-- Penjelasan Pendaftaran -->
-        <div class="info-section">
-            <div class="info-card">
-                <h3 data-i18n="infoTitle">Informasi Pendaftaran</h3>
-                <p data-i18n="infoDescription">Hai Sobat Lyora, saya jelaskan sistem whitelist disini, walaupun kalian sudah daftar di website owner harus konfirmasi manual dari discord karena ini demi keamanan bersama, yap walaupun nick kalian sudah masuk otomatis ke dalam database kalian harus tetap menunggu sampai owner konfirmasi nick kamu. jadi jangan sampai salah masukin usn ya 😘</p>
+        <!-- Error 404 Style Message -->
+        <div class="error-container">
+            <div class="error-card">
+                <div class="error-icon">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 
-                <!-- Video Preview -->
-                <div class="video-container">
-                    <video controls poster="thumbnail.jpg">
-                        <source src="https://files.catbox.moe/zufg7h.mp4" type="video/mp4">
-                        <span data-i18n="videoUnsupported">Browser Anda tidak mendukung pemutaran video.</span>
-                    </video>
-                    <p class="video-caption" data-i18n="videoCaption">Preview Sistem Whitelist</p>
+                <div class="error-code">SYSTEM ERROR</div>
+                <h2>Website Temporary Unavailable</h2>
+                
+                <div class="error-message">
+                    <p><strong>SORRY, THE WEBSITE IS TEMPORARY DOWN</strong></p>
+                    <p>PLEASE CONTACT ADMIN FOR REGISTER USN MANUALLY</p>
                 </div>
-            </div>
-        </div>
 
-        <!-- Main Card -->
-        <div class="card">
-            <!-- Register Section -->
-            <div class="section">
-                <h2 data-i18n="registerTitle">📝 Register Whitelist</h2>
-                <div class="input-group">
-                    <input type="text" id="regUsername" data-i18n-placeholder="usernamePlaceholder" maxlength="20">
-                    <small data-i18n="usernameHint">Make sure it matches your exact Roblox username</small>
+                <div class="solution-section">
+                    <h3>📝 Manual Registration Required:</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Join Discord Server</strong>
+                                <p>Access our community Discord for support</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Contact Admin</strong>
+                                <p>Send direct message to server administrator</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Provide Information</strong>
+                                <p>Submit your Roblox username for manual whitelist</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <input type="text" id="regDiscord" data-i18n-placeholder="discordPlaceholder" maxlength="37">
-                </div>
-                <button class="btn-primary" onclick="registerUser()">
-                    <span class="btn-text" data-i18n="registerBtn">Register Account</span>
-                    <div class="btn-loader hidden"></div>
-                </button>
-                <div id="regResult" class="result"></div>
-            </div>
 
-            <!-- Check Status Section -->
-            <div class="section">
-                <h2 data-i18n="checkTitle">🔍 Check Status</h2>
-                <div class="input-group">
-                    <input type="text" id="checkUsername" data-i18n-placeholder="checkPlaceholder">
+                <div class="contact-info">
+                    <h3>📞 Immediate Support:</h3>
+                    <div class="contact-items">
+                        <div class="contact-item">
+                            <strong>Discord:</strong>
+                            <a href="https://discord.gg/QPGBzAMzeg" target="_blank">Join Server</a>
+                        </div>
+                        <div class="contact-item">
+                            <strong>TikTok:</strong>
+                            <span>@shikimori_md</span>
+                        </div>
+                        <div class="contact-item">
+                            <strong>Status:</strong>
+                            <span class="status-badge">API OFFLINE</span>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn-secondary" onclick="checkStatus()" data-i18n="checkBtn">Check Whitelist</button>
-                <div id="checkResult" class="result"></div>
-            </div>
 
-            <!-- Admin Section -->
-            <div class="section">
-                <h2 data-i18n="adminTitle">⚙️ Admin Panel</h2>
-                <div class="input-group">
-                    <input type="password" id="adminPass" data-i18n-placeholder="adminPlaceholder">
+                <div class="technical-details">
+                    <div class="tech-info">
+                        <strong>Technical Issue:</strong>
+                        <span>Backend API Service Unavailable</span>
+                    </div>
+                    <div class="tech-info">
+                        <strong>Error Code:</strong>
+                        <span>429 - Rate Limit Exceeded</span>
+                    </div>
+                    <div class="tech-info">
+                        <strong>Resolution ETA:</strong>
+                        <span>24-48 Hours</span>
+                    </div>
                 </div>
-                <button class="btn-admin" onclick="getStats()" data-i18n="adminBtn">Access Panel</button>
-                <div id="adminResult" class="result"></div>
             </div>
         </div>
 
@@ -85,31 +114,18 @@
         <div class="footer">
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label" data-i18n="totalUsers">Total Users</div>
+                    <div class="stat-number">OFFLINE</div>
+                    <div class="stat-label">System Status</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number" id="approvedUsers">0</div>
-                    <div class="stat-label" data-i18n="approvedUsers">Approved</div>
+                    <div class="stat-number">-</div>
+                    <div class="stat-label">Users</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number" id="pendingUsers">0</div>
-                    <div class="stat-label" data-i18n="pendingUsers">Pending</div>
+                    <div class="stat-number">MANUAL</div>
+                    <div class="stat-label">Registration</div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Wait Popup -->
-    <div id="waitPopup" class="popup hidden">
-        <div class="popup-content">
-            <div class="popup-icon">⏳</div>
-            <h3 data-i18n="popupTitle">Please Wait</h3>
-            <p data-i18n="popupMessage">Admin will manually confirm your registration for security reasons. If it takes too long, send a message on TikTok @shikimori_md. If you're tired of waiting, join the Discord and tag the server moderator or admin here: https://discord.gg/QPGBzAMzeg</p>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-            <button class="popup-btn" onclick="closePopup()" data-i18n="popupBtn">Understood</button>
         </div>
     </div>
 
