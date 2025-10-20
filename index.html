@@ -3,12 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyora • System Down</title>
+    <title>Lyora • Whitelist</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
+        <!-- Theme Toggle -->
+        <div class="theme-toggle">
+            <button class="theme-btn" id="themeToggle">
+                <span class="sun-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 1V3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 21V23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4.22 4.22L5.64 5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M18.36 18.36L19.78 19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M1 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M21 12H23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4.22 19.78L5.64 18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="moon-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 12.79C20.8427 14.4922 20.2039 16.1144 19.1582 17.4668C18.1126 18.8192 16.7035 19.8458 15.0957 20.4265C13.4879 21.0073 11.748 21.1181 10.0795 20.7461C8.41104 20.3741 6.88299 19.5345 5.67422 18.3258C4.46545 17.117 3.62593 15.589 3.2539 13.9205C2.88187 12.252 2.9927 10.5121 3.57345 8.9043C4.1542 7.29651 5.18082 5.88737 6.5332 4.84175C7.88558 3.79614 9.50779 3.15731 11.21 3C10.2134 4.34827 9.73384 6.00945 9.85849 7.68141C9.98314 9.35338 10.7039 10.9251 11.8894 12.1106C13.0749 13.2961 14.6466 14.0169 16.3186 14.1415C17.9906 14.2662 19.6517 13.7866 21 12.79Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="language-switcher">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="id">ID</button>
+        </div>
+
         <!-- Header -->
         <div class="header">
             <div class="logo">
@@ -24,89 +54,106 @@
                         </defs>
                     </svg>
                 </div>
-                <h1>Lyora</h1>
+                <h1 data-i18n="title">Lyora</h1>
             </div>
-            <p class="subtitle">Whitelist System</p>
+            <p class="subtitle" data-i18n="subtitle">Whitelist System</p>
         </div>
 
-        <!-- Error 404 Style Message -->
-        <div class="error-container">
-            <div class="error-card">
-                <div class="error-icon">
-                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+        <!-- Information Section -->
+        <div class="info-section">
+            <div class="info-card">
+                <div class="info-header">
+                    <div class="info-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 data-i18n="infoTitle">Registration Information</h3>
                 </div>
+                <p data-i18n="infoDescription">Hai Sobat Lyora, saya jelaskan sistem whitelist disini, walaupun kalian sudah daftar di website owner harus konfirmasi manual dari discord karena ini demi keamanan bersama, yap walaupun nick kalian sudah masuk otomatis ke dalam database kalian harus tetap menunggu sampai owner konfirmasi nick kamu. jadi jangan sampai salah masukin usn ya</p>
                 
-                <div class="error-code">SYSTEM ERROR</div>
-                <h2>Website Temporary Unavailable</h2>
-                
-                <div class="error-message">
-                    <p><strong>SORRY, THE WEBSITE IS TEMPORARY DOWN</strong></p>
-                    <p>PLEASE CONTACT ADMIN FOR REGISTER USN MANUALLY</p>
+                <!-- Video Preview -->
+                <div class="video-container">
+                    <div class="video-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.75 12.866L19.52 10.216C19.8296 10.0486 20.1965 9.99882 20.5436 10.0769C20.8907 10.155 21.1931 10.355 21.3914 10.6353C21.5897 10.9156 21.6691 11.2556 21.6136 11.5884C21.5581 11.9212 21.372 12.222 21.092 12.432L15.426 16.858C15.1613 17.0561 14.832 17.1542 14.4979 17.1343C14.1638 17.1144 13.8473 16.9778 13.608 16.748L10.914 14.142C10.7224 13.9566 10.5943 13.7165 10.5474 13.4549C10.5005 13.1933 10.5372 12.9234 10.652 12.684L12.268 9.28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <rect x="3" y="6" width="14" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span data-i18n="videoCaption">System Preview</span>
+                    </div>
+                    <video controls poster="thumbnail.jpg">
+                        <source src="https://files.catbox.moe/zufg7h.mp4" type="video/mp4">
+                        <span data-i18n="videoUnsupported">Browser Anda tidak mendukung pemutaran video.</span>
+                    </video>
                 </div>
+            </div>
+        </div>
 
-                <div class="solution-section">
-                    <h3>📝 Manual Registration Required:</h3>
-                    <div class="steps">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <strong>Join Discord Server</strong>
-                                <p>Access our community Discord for support</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <strong>Contact Admin</strong>
-                                <p>Send direct message to server administrator</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <strong>Provide Information</strong>
-                                <p>Submit your Roblox username for manual whitelist</p>
-                            </div>
-                        </div>
+        <!-- Main Card -->
+        <div class="card">
+            <!-- Register Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
                     </div>
+                    <h2 data-i18n="registerTitle">Register Whitelist</h2>
                 </div>
+                <div class="input-group">
+                    <input type="text" id="regUsername" data-i18n-placeholder="usernamePlaceholder" maxlength="20">
+                    <small data-i18n="usernameHint">Make sure it matches your exact Roblox username</small>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="regDiscord" data-i18n-placeholder="discordPlaceholder" maxlength="37">
+                </div>
+                <button class="btn-primary" onclick="registerUser()">
+                    <span class="btn-text" data-i18n="registerBtn">Register Account</span>
+                    <div class="btn-loader hidden"></div>
+                </button>
+                <div id="regResult" class="result"></div>
+            </div>
 
-                <div class="contact-info">
-                    <h3>📞 Immediate Support:</h3>
-                    <div class="contact-items">
-                        <div class="contact-item">
-                            <strong>Discord:</strong>
-                            <a href="https://discord.gg/QPGBzAMzeg" target="_blank">Join Server</a>
-                        </div>
-                        <div class="contact-item">
-                            <strong>TikTok:</strong>
-                            <span>@shikimori_md</span>
-                        </div>
-                        <div class="contact-item">
-                            <strong>Status:</strong>
-                            <span class="status-badge">API OFFLINE</span>
-                        </div>
+            <!-- Check Status Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
+                    <h2 data-i18n="checkTitle">Check Status</h2>
                 </div>
+                <div class="input-group">
+                    <input type="text" id="checkUsername" data-i18n-placeholder="checkPlaceholder">
+                </div>
+                <button class="btn-secondary" onclick="checkStatus()" data-i18n="checkBtn">Check Whitelist</button>
+                <div id="checkResult" class="result"></div>
+            </div>
 
-                <div class="technical-details">
-                    <div class="tech-info">
-                        <strong>Technical Issue:</strong>
-                        <span>Backend API Service Unavailable</span>
+            <!-- Admin Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M19.4 15C19.2669 15.3016 19.133 15.6031 19 15.9L21 17.9C21 17.9 22 16.9 22 14.9C21.9338 14.1875 21.2996 13.756 20.6 14.1C20.6 14.1 19.6 15 19.4 15Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M4.60002 15C4.73313 15.3016 4.86702 15.6031 5.00002 15.9L3.00002 17.9C3.00002 17.9 2.00002 16.9 2.00002 14.9C2.06623 14.1875 2.70044 13.756 3.40002 14.1C3.40002 14.1 4.40002 15 4.60002 15Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M4.60002 9C4.73313 8.69842 4.86702 8.39694 5.00002 8.10002L3.00002 6.10002C3.00002 6.10002 2.00002 7.10002 2.00002 9.10002C2.06623 9.81253 2.70044 10.244 3.40002 9.90002C3.40002 9.90002 4.40002 9 4.60002 9Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M19.4 9C19.2669 8.69842 19.133 8.39694 19 8.10002L21 6.10002C21 6.10002 22 7.10002 22 9.10002C21.9338 9.81253 21.2996 10.244 20.6 9.90002C20.6 9.90002 19.6 9 19.4 9Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
                     </div>
-                    <div class="tech-info">
-                        <strong>Error Code:</strong>
-                        <span>429 - Rate Limit Exceeded</span>
-                    </div>
-                    <div class="tech-info">
-                        <strong>Resolution ETA:</strong>
-                        <span>24-48 Hours</span>
-                    </div>
+                    <h2 data-i18n="adminTitle">Admin Panel</h2>
                 </div>
+                <div class="input-group">
+                    <input type="password" id="adminPass" data-i18n-placeholder="adminPlaceholder">
+                </div>
+                <button class="btn-admin" onclick="getStats()" data-i18n="adminBtn">Access Panel</button>
+                <div id="adminResult" class="result"></div>
             </div>
         </div>
 
@@ -114,18 +161,37 @@
         <div class="footer">
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-number">OFFLINE</div>
-                    <div class="stat-label">System Status</div>
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label" data-i18n="totalUsers">Total Users</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">-</div>
-                    <div class="stat-label">Users</div>
+                    <div class="stat-number" id="approvedUsers">0</div>
+                    <div class="stat-label" data-i18n="approvedUsers">Approved</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">MANUAL</div>
-                    <div class="stat-label">Registration</div>
+                    <div class="stat-number" id="pendingUsers">0</div>
+                    <div class="stat-label" data-i18n="pendingUsers">Pending</div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Wait Popup -->
+    <div id="waitPopup" class="popup hidden">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="60" height="60" rx="30" fill="#007AFF"/>
+                    <path d="M30 20V30L35 35" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M30 40H30.02" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h3 data-i18n="popupTitle">Please Wait</h3>
+            <p data-i18n="popupMessage">Admin will manually confirm your registration for security reasons. If it takes too long, send a message on TikTok @shikimori_md. If you're tired of waiting, join the Discord and tag the server moderator or admin here: https://discord.gg/QPGBzAMzeg</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <button class="popup-btn" onclick="closePopup()" data-i18n="popupBtn">Understood</button>
         </div>
     </div>
 
