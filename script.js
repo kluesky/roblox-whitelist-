@@ -7,6 +7,8 @@ const translations = {
     en: {
         title: "Lyora",
         subtitle: "Whitelist System",
+        infoTitle: "Registration Information",
+        infoDescription: "Hi Lyora Friends, let me explain the whitelist system here. Even though you've registered on the website, the owner must manually confirm via Discord for our collective security. Yes, even though your nickname is automatically in the database, you still have to wait until the owner confirms your nickname. So make sure you don't enter the wrong username 😘",
         registerTitle: "📝 Register Whitelist",
         checkTitle: "🔍 Check Status", 
         adminTitle: "⚙️ Admin Panel",
@@ -22,12 +24,16 @@ const translations = {
         approvedUsers: "Approved", 
         pendingUsers: "Pending",
         popupTitle: "Please Wait",
-        popupMessage: "admin will manually confirm your registration for security reasons. If it takes too long, send a message on TikTok @shikimori_md. If you’re tired of waiting, join the Discord and tag the server moderator or admin here: https://discord.gg/QPGBzAMzeg",
-        popupBtn: "Understood"
+        popupMessage: "admin will manually confirm your registration for security reasons. If it takes too long, send a message on TikTok @shikimori_md. If you're tired of waiting, join the Discord and tag the server moderator or admin here: https://discord.gg/QPGBzAMzeg",
+        popupBtn: "Understood",
+        videoUnsupported: "Your browser doesn't support video playback.",
+        videoCaption: "Whitelist System Preview"
     },
     id: {
         title: "Lyora", 
         subtitle: "Sistem Whitelist",
+        infoTitle: "Informasi Pendaftaran",
+        infoDescription: "Hai Sobat Lyora, saya jelaskan sistem whitelist disini, walaupun kalian sudah daftar di website owner harus konfirmasi manual dari discord karena ini demi keamanan bersama, yap walaupun nick kalian sudah masuk otomatis ke dalam database kalian harus tetap menunggu sampai owner konfirmasi nick kamu. jadi jangan sampai salah masukin usn ya 😘",
         registerTitle: "📝 Daftar Whitelist",
         checkTitle: "🔍 Cek Status",
         adminTitle: "⚙️ Panel Admin",
@@ -44,7 +50,9 @@ const translations = {
         pendingUsers: "Menunggu",
         popupTitle: "Harap Tunggu",
         popupMessage: "Admin akan mengonfirmasi pendaftaranmu secara manual demi keamanan. Jika prosesnya terlalu lama, kirim pesan di TikTok @shikimori_md. Kalau kamu lelah menunggu, bergabunglah ke Discord dan tag server moderator atau admin di sini: https://discord.gg/QPGBzAMzeg",
-        popupBtn: "Mengerti"
+        popupBtn: "Mengerti",
+        videoUnsupported: "Browser Anda tidak mendukung pemutaran video.",
+        videoCaption: "Preview Sistem Whitelist"
     }
 };
 
