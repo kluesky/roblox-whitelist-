@@ -22,7 +22,7 @@ const translations = {
         approvedUsers: "Approved", 
         pendingUsers: "Pending",
         popupTitle: "Please Wait",
-        popupMessage: "Admin will confirm your registration within 4 minutes",
+        popupMessage: "admin will manually confirm your registration for security reasons. If it takes too long, send a message on TikTok @shikimori_md. If you’re tired of waiting, join the Discord and tag the server moderator or admin here: https://discord.gg/QPGBzAMzeg",
         popupBtn: "Understood"
     },
     id: {
@@ -43,7 +43,7 @@ const translations = {
         approvedUsers: "Disetujui",
         pendingUsers: "Menunggu",
         popupTitle: "Harap Tunggu",
-        popupMessage: "Admin akan konfirmasi pendaftaran Anda dalam 4 menit",
+        popupMessage: "Admin akan mengonfirmasi pendaftaranmu secara manual demi keamanan. Jika prosesnya terlalu lama, kirim pesan di TikTok @shikimori_md. Kalau kamu lelah menunggu, bergabunglah ke Discord dan tag server moderator atau admin di sini: https://discord.gg/QPGBzAMzeg",
         popupBtn: "Mengerti"
     }
 };
