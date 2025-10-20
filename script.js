@@ -64,37 +64,39 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('⚡ Lyora Whitelist System Loaded');
 });
 
-// Language System
+// Language System - FIXED VERSION
 function initLanguage() {
+    // Immediately apply translations when page loads
+    applyTranslations('en');
+    
     const langButtons = document.querySelectorAll('.lang-btn');
     
     langButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const lang = this.getAttribute('data-lang');
-            switchLanguage(lang);
+            applyTranslations(lang);
             
             // Update active state
             langButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            currentLang = lang;
         });
     });
 }
 
-function switchLanguage(lang) {
-    currentLang = lang;
-    
-    // Update all elements with data-i18n attribute
+function applyTranslations(lang) {
+    // Update all text elements
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
-        if (translations[lang][key]) {
+        if (translations[lang] && translations[lang][key]) {
             element.textContent = translations[lang][key];
         }
     });
     
-    // Update placeholders
+    // Update all placeholders
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
         const key = element.getAttribute('data-i18n-placeholder');
-        if (translations[lang][key]) {
+        if (translations[lang] && translations[lang][key]) {
             element.placeholder = translations[lang][key];
         }
     });

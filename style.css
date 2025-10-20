@@ -458,6 +458,12 @@ button {
     color: var(--text-muted);
 }
 
+/* Fix for text visibility */
+[data-i18n], [data-i18n-placeholder] {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .container {
